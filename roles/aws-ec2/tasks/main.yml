@@ -1,0 +1,35 @@
+---
+
+# Launches EC2 instance with specified AMI, or makes sure it exists
+# Inputs:
+# - ami_id
+# - instance_tags: A hash dictionary of instance tags
+# - instance_type
+# - count
+# - vpc_subnet_id
+# - security_group_id
+# - region
+# Outputs:
+# - ec2
+
+- name: Launch instance
+  amazon.aws.ec2:
+    key_name: default
+    instance_tags: "{{ instance_tags }}"
+    instance_type: "{{ instance_type }}"
+    image: "{{ ami_id }}"
+    wait: yes
+    exact_count: "{{ count }}"
+    count_tag: "{{ instance_tags }}"
+    assign_public_ip: yes
+    vpc_subnet_id: "{{ vpc_subnet_id }}"
+    group_id: "{{ security_group_id }}"
+    region: "{{ region }}"
+  register: ec2
+
+- name: Wait for SSH to come up
+  delegate_to: "{{ item.public_dns_name }}"
+  wait_for_connection:
+    delay: 60
+    timeout: 320
+  loop: "{{ ec2.instances }}"

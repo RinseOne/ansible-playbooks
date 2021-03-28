@@ -1,0 +1,119 @@
+Resources:
+
+  MainVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.100.0.0/16
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.0.0/24
+      AvailabilityZone: us-east-1a
+      VpcId: !Ref MainVpc
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.1.0/24
+      AvailabilityZone: us-east-1b
+      VpcId: !Ref MainVpc
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.2.0/24
+      AvailabilityZone: us-east-1c
+      VpcId: !Ref MainVpc
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.3.0/24
+      AvailabilityZone: us-east-1d
+      VpcId: !Ref MainVpc
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetE:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.4.0/24
+      AvailabilityZone: us-east-1e
+      VpcId: !Ref MainVpc
+      MapPublicIpOnLaunch: true
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVpc
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref MainVpc
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetCRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetC
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetDRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetD
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetERouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetE
+      RouteTableId: !Ref PublicRouteTable
+
+Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !Ref MainVpc
+    Export:
+      Name: VpcIdUsEast1
+  PublicSubnetAId:
+    Description: Public subnet A ID
+    Value: !Ref PublicSubnetA
+  PublicSubnetBId:
+    Description: Public subnet B ID
+    Value: !Ref PublicSubnetB
+  PublicSubnetCId:
+    Description: Public subnet C ID
+    Value: !Ref PublicSubnetC
+  PublicSubnetDId:
+    Description: Public subnet D ID
+    Value: !Ref PublicSubnetD
+  PublicSubnetEId:
+    Description: Public subnet E ID
+    Value: !Ref PublicSubnetE

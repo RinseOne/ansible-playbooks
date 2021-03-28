@@ -1,0 +1,69 @@
+Resources:
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: bastion-sg
+      GroupDescription: Bastion Security Group
+      VpcId: !ImportValue VpcIdUsEast1
+
+  BastionSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 0.0.0.0/0
+
+  WebAppLoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: webapp-alb-sg
+      GroupDescription: Web App ALB Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue VpcIdUsEast1
+
+  WebAppServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: webapp-server-sg
+      GroupDescription: Web App Server Security Group
+      VpcId: !ImportValue VpcIdUsEast1
+
+  WebAppServerSecurityGroupIngressLB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref WebAppServerSecurityGroup
+      IpProtocol: tcp
+      FromPort: 8080
+      ToPort: 8080
+      SourceSecurityGroupId: !GetAtt WebAppLoadBalancerSecurityGroup.GroupId
+
+  WebAppServerSecurityGroupIngressBastion:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref WebAppServerSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      SourceSecurityGroupId: !GetAtt BastionSecurityGroup.GroupId
+
+Outputs:
+  BastionSgId:
+    Description: Bastion Security Group ID
+    Value: !Ref BastionSecurityGroup
+  WebAppLbSgId:
+    Description: Web App Load Balancer Security Group ID
+    Value: !Ref WebAppLoadBalancerSecurityGroup
+  WebAppServerSgId:
+    Description: Web App Server Security Group ID
+    Value: !Ref WebAppServerSecurityGroup

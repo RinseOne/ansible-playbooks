@@ -1,0 +1,29 @@
+---
+
+# Looks up the last AMI for given owner and filter
+# Inputs:
+# - owner_account_id
+# - filter_by_name
+# Outputs:
+# - amis: result of AMI search
+# - aws_ami_lookup_ami: ID of the last AMI found
+
+- name: Look up latest AMI in AWS
+  amazon.aws.ec2_ami_info:
+    owners: "{{ owner_account_id }}"
+    filters:
+      name: "{{ filter_by_name }}"
+  register: amis
+
+- name: Print out AMIs
+  debug:
+    var: amis
+
+- name: Set found AMI variable
+  set_fact:
+    aws_ami_lookup_ami: >
+      {{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
+
+- name: Found AMI image ID
+  debug:
+    msg: "{{ aws_ami_lookup_ami.image_id }}"

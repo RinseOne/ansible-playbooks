@@ -1,0 +1,32 @@
+---
+
+# Creates an AWS VPC stack and security groups via CloudFormation
+# Inputs:
+# - aws_vpc_region
+# Outputs:
+# - aws_vpc_output
+# - aws_vpc_sg_output
+
+- name: Create VPC via CloudFormation
+  amazon.aws.cloudformation:
+    stack_name: "vpc-main-use1"
+    state: "present"
+    region: "{{ aws_vpc_region }}"
+    template: "roles/aws-vpc/files/cloudformation-{{ aws_vpc_region }}-vpc.yml"
+  register: aws_vpc_output
+
+- name: VPC output
+  debug:
+    msg: "{{ aws_vpc_output.stack_outputs }}"
+
+- name: Create security groups via CloudFormation
+  amazon.aws.cloudformation:
+    stack_name: "vpc-security-use1"
+    state: "present"
+    region: "{{ aws_vpc_region }}"
+    template: "roles/aws-vpc/files/cloudformation-{{ aws_vpc_region }}-sg.yml"
+  register: aws_vpc_sg_output
+
+- name: Security output
+  debug:
+    msg: "{{ aws_vpc_sg_output.stack_outputs }}"

@@ -1,0 +1,21 @@
+---
+
+- name: Copy SSH keys
+  ansible.posix.authorized_key:
+    user: ubuntu
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - roles/base/files/public_keys/unix1_rsa.pub
+
+- name: Upgrade packages using apt
+  become: yes
+  apt:
+    update_cache: yes
+    upgrade: safe
+
+- name: Install base packages
+  become: yes
+  apt:
+    pkg:
+    - vim

@@ -1,0 +1,8 @@
+---
+
+- hosts: localhost
+  roles:
+    - {
+        role: aws-vpc,
+        aws_vpc_region: "{{ aws_region }}"
+      }

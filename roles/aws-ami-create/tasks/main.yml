@@ -1,0 +1,23 @@
+---
+
+# Creates a new AMI from the given EC2 instance
+# Inputs:
+# - aws_ami_create_ami_name: base name to use for AMI, before appending date and time
+# - aws_ami_create_instance_name: value of the Name tag of the EC2 instances from which to create the AMI
+# - aws_ami_create_region: AWS region
+# Outputs: None
+
+- name: Find the EC2 instance ID
+  ec2_instance_info:
+    filters:
+      "tag:Name": "{{ aws_ami_create_instance_name }}"
+      instance-state-name: [ "running", "stopped" ]
+  register: ec2_instances
+
+- name: Create new AMI from instance
+  amazon.aws.ec2_ami:
+    instance_id: "{{ ec2_instances.instances.0.instance_id }}"
+    wait: yes
+    name: "{{ aws_ami_create_ami_name }}-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
+    tags:
+      Name: "{{ aws_ami_create_ami_name }}"
