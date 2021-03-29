@@ -3,7 +3,7 @@
 # Terminates EC2 instances with the given name
 # Inputs:
 # - aws_ec2_terminate_instance_name: value of the Name tag of the EC2 instances to terminate
-# - region: AWS region of the instance
+# - aws_ec2_terminate_region: AWS region of the instance
 # Outputs: None
 
 - name: Find the EC2 instance IDs
@@ -17,5 +17,5 @@
   amazon.aws.ec2:
     state: 'absent'
     instance_ids: "{{ item.instance_id }}"
-    region: "{{ region }}"
+    region: "{{ aws_ec2_terminate_region }}"
   with_items: "{{ ec2_instances.instances }}"

@@ -53,5 +53,5 @@
     - {
         role: aws-ec2-terminate,
         aws_ec2_terminate_instance_name: amibuilder_base,
-        region: "{{ aws_region }}"
+        aws_ec2_terminate_region: "{{ aws_region }}"
       }
