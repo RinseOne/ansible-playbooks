@@ -1,0 +1,9 @@
+---
+
+- name: Install bastion packages
+  become: yes
+  apt:
+    pkg:
+    - curl
+    - netcat
+    - dnsutils
