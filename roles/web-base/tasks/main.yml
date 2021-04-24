@@ -1,0 +1,23 @@
+---
+
+- name: Download Erlang Solutions repo key package
+  get_url:
+    url: https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
+    dest: /tmp/erlang-solutions_2.0_all.deb
+
+- name: Install Erlang Solutions repo key
+  become: yes
+  apt:
+    deb: /tmp/erlang-solutions_2.0_all.deb
+
+- name: Update apt cache
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: Install erlang and units
+  become: yes
+  apt:
+    pkg:
+    - erlang
+    - units

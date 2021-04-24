@@ -1,0 +1,59 @@
+---
+
+- hosts: localhost
+  gather_facts: no
+  roles:
+    - {
+        role: aws-vpc,
+        aws_vpc_region: "{{ aws_region }}"
+      }
+    - {
+        role: aws-ami-lookup,
+        owner_account_id: self,
+        filter_by_name: "base-*"
+      }
+    - {
+        role: aws-ec2,
+        ami_id: "{{ aws_ami_lookup_ami.image_id }}",
+        instance_tags: {"Name": "amibuilder_web_base"},
+        instance_type: "t3.nano",
+        count: 1,
+        vpc_subnet_id: "{{ aws_vpc_output.stack_outputs.PublicSubnetBId }}",
+        security_group_id: "{{ aws_vpc_sg_output.stack_outputs.BastionSgId }}",
+        region: "{{ aws_region }}"
+      }
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Refresh inventory
+      meta: refresh_inventory
+
+- hosts: tag_Name_amibuilder_web_base
+  roles:
+    - web-base
+
+- hosts: localhost
+  roles:
+    - {
+        role: aws-ami-create,
+        aws_ami_create_ami_name: web_base,
+        aws_ami_create_instance_name: amibuilder_web_base,
+        aws_ami_create_region: "{{ aws_region }}"
+      }
+    - {
+        role: aws-ami-lookup,
+        owner_account_id: self,
+        filter_by_name: "web_base-*"
+      }
+    - {
+        role: aws-ami-cleanup,
+        aws_ami_cleanup_amis: "{{ amis }}",
+        aws_ami_cleanup_exclude_ami_id: "{{ aws_ami_lookup_ami.image_id }}",
+        aws_ami_cleanup_region: "{{ aws_region }}"
+      }
+    - {
+        role: aws-ec2-terminate,
+        aws_ec2_terminate_instance_name: amibuilder_web_base,
+        aws_ec2_terminate_region: "{{ aws_region }}"
+      }
