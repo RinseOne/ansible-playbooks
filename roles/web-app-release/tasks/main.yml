@@ -1,0 +1,31 @@
+---
+
+# Installs given version of the OTP application as a systemd service
+# Inputs:
+# - app_version
+# Outputs: None
+
+- name: Download release archive
+  get_url:
+    url: "https://github.com/RinseOne/rinseweb/releases/download/{{ app_version }}/rinseweb.tar.gz"
+    dest: /tmp/rinseweb.tar.gz
+
+- name: Unarchive the release
+  become: yes
+  ansible.builtin.unarchive:
+    src: /tmp/rinseweb.tar.gz
+    dest: /opt
+    remote_src: yes
+
+- name: Copy systemd service file
+  become: yes
+  ansible.builtin.copy:
+    src: roles/web-app-release/files/rinseweb.service
+    dest: /etc/systemd/system/rinseweb.service
+
+- name: Enable and start systemd service
+  become: yes
+  ansible.builtin.systemd:
+    name: rinseweb.service
+    state: started
+    enabled: yes

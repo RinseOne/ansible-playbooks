@@ -1,0 +1,15 @@
+[Unit]
+Description=rinseweb service
+After=network.target
+
+[Service]
+ExecStart=/opt/rinseweb/bin/rinseweb foreground
+ExecStop=/opt/rinseweb/bin/rinseweb stop
+ExecReload=/opt/rinseweb/bin/rinseweb restart
+Restart=on-failure
+RestartSec=3
+User=ubuntu
+Group=ubuntu
+
+[Install]
+WantedBy=multi-user.target
