@@ -3,9 +3,24 @@
 # Deletes all AMIs, except the one specified
 # Inputs:
 # - aws_ami_cleanup_amis: list of matching AMI objects
-# - aws_ami_cleanup_exclude_ami_id: the AMI ID to exclude from cleanup
+# - aws_ami_cleanup_keep_newest: integer number of newest AMIs to keep
 # - aws_ami_cleanup_region: AWS region
 # Outputs: None
+
+- name: Find the AMIs to keep
+  set_fact:
+    aws_ami_cleanup_exclude_amis: "{{ (aws_ami_cleanup_amis.images | sort(attribute='creation_date') | reverse | list)[:aws_ami_cleanup_keep_newest] }}"
+
+- name: Make a list of AMI IDs to keep
+  set_fact:
+    aws_ami_cleanup_exclude_ami_ids: "\
+      {{ aws_ami_cleanup_eclude_ami_ids | default([]) }} + \
+      [ '{{ item['image_id'] }}' ]"
+  with_items: "{{ aws_ami_cleanup_exclude_amis }}"
+
+- name: Print out AMI IDs to keep
+  debug:
+    var: aws_ami_cleanup_exclude_ami_ids
 
 - name: Delete AMIs
   amazon.aws.ec2_ami:
@@ -15,4 +30,4 @@
     image_id: "{{ item.image_id }}"
     region: "{{ aws_ami_cleanup_region }}"
   with_items: "{{ aws_ami_cleanup_amis.images }}"
-  when: item.image_id != aws_ami_cleanup_exclude_ami_id
+  when: item.image_id not in aws_ami_cleanup_exclude_ami_ids

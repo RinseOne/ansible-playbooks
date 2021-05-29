@@ -49,7 +49,7 @@
     - {
         role: aws-ami-cleanup,
         aws_ami_cleanup_amis: "{{ amis }}",
-        aws_ami_cleanup_exclude_ami_id: "{{ aws_ami_lookup_ami.image_id }}",
+        aws_ami_cleanup_keep_newest: 1,
         aws_ami_cleanup_region: "{{ aws_region }}"
       }
     - {
