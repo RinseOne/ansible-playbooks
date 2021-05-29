@@ -35,5 +35,5 @@ Starts an instance from the base AMI, customizes, creates the web base AMI and t
 instance. It also cleans up old web base AMIs, keeping only the latest one.
 
 ```
-ansible-playbook -e "aws_region=us-east-1" create_web_ami.yml
+ansible-playbook -e "aws_region=us-east-1" create_web_base_ami.yml
 ```
