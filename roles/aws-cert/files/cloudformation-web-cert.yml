@@ -1,0 +1,30 @@
+Parameters:
+
+  Domain:
+    Description: Domain for certificate
+    Type: String
+  HostedZoneId:
+    Description: Route53 Hosted Zone ID of the domain
+    Type: String
+  SANs:
+    Description: Subject Alternative Names for the certificate
+    Type: List<String>
+
+Resources:
+
+  WebCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref Domain
+      DomainValidationOptions:
+        - DomainName: !Ref Domain
+          HostedZoneId: !Ref HostedZoneId
+      SubjectAlternativeNames: !Ref SANs
+      ValidationMethod: DNS
+
+Outputs:
+  WebCertificateArn:
+    Description: Certificate ARN
+    Value: !Ref WebCertificate
+    Export:
+      Name: WebCertificateArn

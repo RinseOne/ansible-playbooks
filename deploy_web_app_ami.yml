@@ -1,0 +1,25 @@
+---
+
+- hosts: localhost
+  gather_facts: no
+  roles:
+    - {
+        role: aws-vpc,
+        aws_vpc_region: "{{ aws_region }}"
+      }
+    - {
+        role: aws-ami-lookup,
+        owner_account_id: self,
+        filter_by_name: "web_app-*"
+      }
+    - {
+        role: web-app,
+        web_app_alb_sg_ids: "{{ [aws_vpc_sg_output.stack_outputs.WebAppLbSgId] | join(',') }}",
+        web_app_alb_subnet_ids: "{{ [aws_vpc_output.stack_outputs.PublicSubnetAId, aws_vpc_output.stack_outputs.PublicSubnetBId, aws_vpc_output.stack_outputs.PublicSubnetCId, aws_vpc_output.stack_outputs.PublicSubnetDId, aws_vpc_output.stack_outputs.PublicSubnetEId] | join(',') }}",
+        web_app_ami_id: "{{ aws_ami_lookup_ami.image_id }}",
+        web_app_instance_type: "t3.nano",
+        web_app_initial_setup: "{{ initial | default('false') }}",
+        web_app_region: "{{ aws_region }}",
+        web_app_server_sg_ids: "{{ [aws_vpc_sg_output.stack_outputs.WebAppServerSgId] | join(',') }}",
+        web_app_vpc_id: "{{ aws_vpc_output.stack_outputs.VpcId }}"
+      }

@@ -1,0 +1,67 @@
+Parameters:
+
+  Domain:
+    Description: Domain for hosted zone
+    Type: String
+
+Resources:
+
+  WebHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref Domain
+
+  WebMainRecordSetGroup:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref WebHostedZone
+      RecordSets:
+        - Name: !Ref Domain
+          AliasTarget:
+            DNSName: !ImportValue WebLoadBalancerDnsNameUsEast1
+            EvaluateTargetHealth: true
+            HostedZoneId: !ImportValue WebLoadBalancerHostedZoneIdUsEast1
+          Type: A
+
+  WebMailRecordSetGroup:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref WebHostedZone
+      RecordSets:
+        - Name: !Join ["", ["@.", !Ref Domain]]
+          TTL: 21600
+          Type: MX
+          ResourceRecords:
+            - 10 in1-smtp.messagingengine.com
+            - 20 in2-smtp.messagingengine.com
+        - Name: !Join ["", ["@.", !Ref Domain]]
+          TTL: 21600
+          Type: TXT
+          ResourceRecords:
+            - "\"v=spf1 include:spf.messagingengine.com ?all\""
+        - Name: !Join ["", ["fm1._domainkey.", !Ref Domain]]
+          TTL: 21600
+          Type: CNAME
+          ResourceRecords:
+            - !Join ["", ["fm1.", !Ref Domain, ".dkim.fmhosted.com"]]
+        - Name: !Join ["", ["fm2._domainkey.", !Ref Domain]]
+          TTL: 21600
+          Type: CNAME
+          ResourceRecords:
+            - !Join ["", ["fm2.", !Ref Domain, ".dkim.fmhosted.com"]]
+        - Name: !Join ["", ["fm3._domainkey.", !Ref Domain]]
+          TTL: 21600
+          Type: CNAME
+          ResourceRecords:
+            - !Join ["", ["fm3.", !Ref Domain, ".dkim.fmhosted.com"]]
+
+Outputs:
+  HostedZoneId:
+    Description: Hosted Zone ID
+    Value: !Ref WebHostedZone
+  WebMainDomain:
+    Description: Main RecordSetGroup Domain Name
+    Value: !Ref WebMainRecordSetGroup
+  WebMailDomain:
+    Description: Mail RecordSetGroup Domain Name
+    Value: !Ref WebMailRecordSetGroup

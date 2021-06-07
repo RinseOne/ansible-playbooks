@@ -1,0 +1,15 @@
+---
+
+- hosts: localhost
+  gather_facts: no
+  roles:
+    - {
+        role: aws-route53,
+        aws_route53_web_domain: "{{ domain }}"
+      }
+    - {
+        role: aws-cert,
+        aws_cert_web_domain: "{{ domain }}",
+        aws_cert_web_hosted_zone_id: "{{ aws_route53_output.stack_outputs.HostedZoneId }}",
+        aws_cert_web_sans: "*.{{ domain }}"
+      }

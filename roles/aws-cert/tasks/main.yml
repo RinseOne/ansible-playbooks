@@ -1,0 +1,25 @@
+---
+
+# AWS Certificate
+# Inputs:
+# - aws_cert_web_domain
+# - aws_cert_web_hosted_zone_id
+# - aws_cert_web_sans: comma-separated list of subject alternative names
+# Outputs:
+# - aws_cert_web_output
+#     WebCertificateArn
+
+- name: SSL cert via CloudFormation
+  amazon.aws.cloudformation:
+    stack_name: "web-cert"
+    state: "present"
+    template: "roles/aws-cert/files/cloudformation-web-cert.yml"
+    template_parameters:
+      Domain: "{{ aws_cert_web_domain }}"
+      HostedZoneId: "{{ aws_cert_web_hosted_zone_id }}"
+      SANs: "{{ aws_cert_web_sans }}"
+  register: aws_cert_web_output
+
+- name: Route53 web cert output
+  debug:
+    msg: "{{ aws_cert_web_output.stack_outputs }}"

@@ -1,0 +1,23 @@
+---
+
+# AWS Route53 setup
+# Inputs:
+# - aws_route53_web_domain
+# Outputs:
+# - aws_route53_output
+#     HostedZoneId
+#     WebMainDomain
+#     WebMailDomain
+
+- name: Web domain via CloudFormation
+  amazon.aws.cloudformation:
+    stack_name: "web-domain"
+    state: "present"
+    template: "roles/aws-route53/files/cloudformation-web-domain.yml"
+    template_parameters:
+      Domain: "{{ aws_route53_web_domain }}"
+  register: aws_route53_output
+
+- name: Route53 output
+  debug:
+    msg: "{{ aws_route53_output.stack_outputs }}"

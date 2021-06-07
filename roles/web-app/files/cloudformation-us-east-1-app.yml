@@ -1,0 +1,166 @@
+Parameters:
+
+  AlbSecurityGroupIds:
+    Description: Security groups for the ALB
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  AlbSubnetIds:
+    Description: Subnets for the ALB
+    Type: List<AWS::EC2::Subnet::Id>
+  AmiId:
+    Description: Region specific image
+    Type: AWS::EC2::Image::Id
+  InitialSetupNoHttps:
+    Description: If this is true, HTTPS listener will not be created
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  InstanceType:
+    Description: Web server EC2 instance type
+    Type: String
+  ServerSecurityGroupIds:
+    Description: Security groups for the EC2 instances
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  VpcId:
+    Description: AWS VPC ID
+    Type: AWS::EC2::VPC::Id
+
+Conditions:
+
+  EnableHttpsListener: !Equals
+    - !Ref InitialSetupNoHttps
+    - 'false'
+
+Resources:
+
+  WebAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      DesiredCapacity: 1
+      HealthCheckGracePeriod: 120
+      HealthCheckType: ELB
+      LaunchTemplate:
+        LaunchTemplateId: !Ref WebLaunchTemplate
+        Version: !GetAtt WebLaunchTemplate.DefaultVersionNumber
+      MaxSize: 3
+      MinSize: 1
+      TargetGroupARNs:
+        - !Ref WebTargetGroup
+      VPCZoneIdentifier: !Ref AlbSubnetIds
+
+  WebLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: !Ref AmiId
+        InstanceType: !Ref InstanceType
+        SecurityGroupIds: !Ref ServerSecurityGroupIds
+
+  WebTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: 8080
+      HealthCheckPath: "/"
+      HealthyThresholdCount: 3
+      Port: 8080
+      Protocol: HTTP
+      UnhealthyThresholdCount: 5
+      VpcId: !Ref VpcId
+
+  WebApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Scheme: internet-facing
+      SecurityGroups: !Ref AlbSecurityGroupIds
+      Subnets: !Ref AlbSubnetIds
+      Type: application
+
+  WebListener80:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: HTTPS
+            Port: 443
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            StatusCode: HTTP_301
+      LoadBalancerArn: !Ref WebApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  WebListener443:
+    Condition: EnableHttpsListener
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !ImportValue WebCertificateArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebTargetGroup
+      LoadBalancerArn: !Ref WebApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+
+  WebSslCertificate:
+    Condition: EnableHttpsListener
+    Type: AWS::ElasticLoadBalancingV2::ListenerCertificate
+    Properties:
+      Certificates:
+        - CertificateArn: !ImportValue WebCertificateArn
+      ListenerArn: !Ref WebListener443
+
+Outputs:
+  WebAutoScalingGroupId:
+    Description: Web App AutoScaling Group ID
+    Value: !Ref WebAutoScalingGroup
+  WebLaunchTemplateId:
+    Description: Web App Launch Template ID
+    Value: !Ref WebLaunchTemplate
+  WebLaunchTemplateDefaultVersion:
+    Description: Web App Launch Template Default Version
+    Value: !GetAtt WebLaunchTemplate.DefaultVersionNumber
+  WebLaunchTemplateLatestVersionNumber:
+    Description: Web App Launch Template Latest Version
+    Value: !GetAtt WebLaunchTemplate.LatestVersionNumber
+  WebTargetGroupId:
+    Description: Web App Target Group ID
+    Value: !Ref WebTargetGroup
+  WebTargetGroupName:
+    Description: Web Target Group Name
+    Value: !GetAtt WebTargetGroup.TargetGroupName
+  WebTargetGroupFullName:
+    Description: Web Target Group Full Name
+    Value: !GetAtt WebTargetGroup.TargetGroupFullName
+  WebLoadBalancerId:
+    Description: Web App Load Balancer ID
+    Value: !Ref WebApplicationLoadBalancer
+  WebLoadBalancerHostedZoneId:
+    Description: Web App Load Balancer Hosted Zone ID
+    Value: !GetAtt WebApplicationLoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: WebLoadBalancerHostedZoneIdUsEast1
+  WebLoadBalancerDnsName:
+    Description: Web App Load Balancer DNS Name
+    Value: !GetAtt WebApplicationLoadBalancer.DNSName
+    Export:
+      Name: WebLoadBalancerDnsNameUsEast1
+  WebLoadBalancerName:
+    Description: Web App Load Balancer Name
+    Value: !GetAtt WebApplicationLoadBalancer.LoadBalancerName
+  WebLoadBalancerFullName:
+    Description: Web App Load Balancer Full Name
+    Value: !GetAtt WebApplicationLoadBalancer.LoadBalancerFullName
+  WebListenerHttpId:
+    Description: Web App Load Balancer Listener ID for HTTP
+    Value: !Ref WebListener80
+  WebListenerHttpArn:
+    Description: Web App Load Balancer Listener ARN for HTTP
+    Value: !GetAtt WebListener80.ListenerArn

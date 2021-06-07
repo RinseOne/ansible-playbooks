@@ -1,0 +1,48 @@
+---
+
+# AWS ALB and ASG for web
+# Inputs:
+# - web_app_alb_sg_ids
+# - web_app_alb_subnet_ids
+# - web_app_ami_id
+# - web_app_initial_setup
+# - web_app_instance_type
+# - web_app_region
+# - web_app_server_sg_ids
+# - web_app_vpc_id
+# Outputs:
+# - aws_web_app_output
+#     WebAutoScalingGroupId
+#     WebLaunchTemplateDefaultVersion
+#     WebLaunchTemplateId
+#     WebLaunchTemplateLatestVersionNumber
+#     WebListenerHttpArn
+#     WebListenerHttpId
+#     WebLoadBalancerDnsName
+#     WebLoadBalancerFullName
+#     WebLoadBalancerHostedZoneId
+#     WebLoadBalancerId
+#     WebLoadBalancerName
+#     WebTargetGroupFullName
+#     WebTargetGroupId
+#     WebTargetGroupName
+
+- name: Web app via CloudFormation
+  amazon.aws.cloudformation:
+    stack_name: "web-app-use1"
+    state: "present"
+    region: "{{ web_app_region }}"
+    template: "roles/web-app/files/cloudformation-{{ web_app_region }}-app.yml"
+    template_parameters:
+      AlbSecurityGroupIds: "{{ web_app_alb_sg_ids }}"
+      AlbSubnetIds: "{{ web_app_alb_subnet_ids }}"
+      AmiId: "{{ web_app_ami_id }}"
+      InitialSetupNoHttps: "{{ web_app_initial_setup }}"
+      InstanceType: "{{ web_app_instance_type }}"
+      ServerSecurityGroupIds: "{{ web_app_server_sg_ids }}"
+      VpcId: "{{ web_app_vpc_id }}"
+  register: aws_web_app_output
+
+- name: Web app output
+  debug:
+    msg: "{{ aws_web_app_output.stack_outputs }}"
