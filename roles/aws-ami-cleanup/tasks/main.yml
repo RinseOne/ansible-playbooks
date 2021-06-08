@@ -14,7 +14,7 @@
 - name: Make a list of AMI IDs to keep
   set_fact:
     aws_ami_cleanup_exclude_ami_ids: "\
-      {{ aws_ami_cleanup_eclude_ami_ids | default([]) }} + \
+      {{ aws_ami_cleanup_exclude_ami_ids | default([]) }} + \
       [ '{{ item['image_id'] }}' ]"
   with_items: "{{ aws_ami_cleanup_exclude_amis }}"
 
