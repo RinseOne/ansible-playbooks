@@ -42,12 +42,24 @@ Resources:
       HealthCheckType: ELB
       LaunchTemplate:
         LaunchTemplateId: !Ref WebLaunchTemplate
-        Version: !GetAtt WebLaunchTemplate.DefaultVersionNumber
+        Version: !GetAtt WebLaunchTemplate.LatestVersionNumber
       MaxSize: 3
       MinSize: 1
       TargetGroupARNs:
         - !Ref WebTargetGroup
       VPCZoneIdentifier: !Ref AlbSubnetIds
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MinInstancesInService: 1
+        MaxBatchSize: 1
+        PauseTime: PT3M5S
+        WaitOnResourceSignals: false
+        SuspendProcesses:
+          - HealthCheck
+          - ReplaceUnhealthy
+          - AZRebalance
+          - AlarmNotification
+          - ScheduledActions
 
   WebLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
