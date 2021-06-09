@@ -61,6 +61,16 @@ Resources:
           - AlarmNotification
           - ScheduledActions
 
+  WebAutoScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref WebAutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 30
+
   WebLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -133,6 +143,9 @@ Outputs:
   WebAutoScalingGroupId:
     Description: Web App AutoScaling Group ID
     Value: !Ref WebAutoScalingGroup
+  WebAutoScalingPolicyId:
+    Description: Web App AutoScaling Policy ID
+    Value: !Ref WebAutoScalingPolicy
   WebLaunchTemplateId:
     Description: Web App Launch Template ID
     Value: !Ref WebLaunchTemplate
