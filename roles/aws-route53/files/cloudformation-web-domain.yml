@@ -28,13 +28,13 @@ Resources:
     Properties:
       HostedZoneId: !Ref WebHostedZone
       RecordSets:
-        - Name: !Join ["", ["@.", !Ref Domain]]
+        - Name: !Ref Domain
           TTL: 21600
           Type: MX
           ResourceRecords:
             - 10 in1-smtp.messagingengine.com
             - 20 in2-smtp.messagingengine.com
-        - Name: !Join ["", ["@.", !Ref Domain]]
+        - Name: !Ref Domain
           TTL: 21600
           Type: TXT
           ResourceRecords:
