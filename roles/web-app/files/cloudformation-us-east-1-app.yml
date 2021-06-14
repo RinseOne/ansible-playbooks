@@ -19,6 +19,9 @@ Parameters:
   InstanceType:
     Description: Web server EC2 instance type
     Type: String
+  ScalingCpuUtilizationThreshold:
+    Description: Autoscaling group CPU utiliation % threshold at which to trigger a scaling out event
+    Type: Number
   ServerSecurityGroupIds:
     Description: Security groups for the EC2 instances
     Type: List<AWS::EC2::SecurityGroup::Id>
@@ -69,7 +72,7 @@ Resources:
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 30
+        TargetValue: !Ref ScalingCpuUtilizationThreshold
 
   WebLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
