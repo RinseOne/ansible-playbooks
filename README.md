@@ -1,6 +1,20 @@
-# Ansible
+# Ansible Playbooks
+
+- [Ansible Playbooks](#ansible-playbooks)
+  - [Base setup](#base-setup)
+    - [Prerequisites](#prerequisites)
+    - [VPC](#vpc)
+    - [Base AMI](#base-ami)
+    - [Web Base AMI](#web-base-ami)
+    - [Web App AMI](#web-app-ami)
+    - [Load Balancer and Autoscaling Group](#load-balancer-and-autoscaling-group)
+  - [Releases](#releases)
+    - [Create a New Web App AMI](#create-a-new-web-app-ami)
+    - [Release Latest Web App AMI](#release-latest-web-app-ami)
 
 ## Base setup
+
+This section covers one-time base infrastructure setup.
 
 ### Prerequisites
 
@@ -38,6 +52,10 @@ instance. It also cleans up old web base AMIs, keeping only the latest one.
 ansible-playbook -e "aws_region=us-east-1" create_web_base_ami.yml
 ```
 
+### Web App AMI
+
+Follow instructions for [creating a new web app AMI](#create-a-new-web-app-ami) below.
+
 ### Load Balancer and Autoscaling Group
 
 Initial setup creates the load balancer and the autoscaling group without the HTTPS listener.
@@ -69,6 +87,8 @@ ansible-playbook -e "aws_region=us-east-1" deploy_web_app_ami.yml
 ```
 
 ## Releases
+
+This section covers steps needed every time we want to deploy a new version of the web app.
 
 ### Create a New Web App AMI
 
