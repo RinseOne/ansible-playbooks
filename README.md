@@ -46,7 +46,17 @@ Initial setup creates the load balancer and the autoscaling group without the HT
 ansible-playbook -e "aws_region=us-east-1" -e "initial=true" deploy_web_app_ami.yml
 ```
 
-Create the hosted zone for the domain that points to the ALB, along with the SSL certificate.
+Create the hosted zone in AWS Route53 - we pass the `initial=true` flag to avoid creating a cert yet.
+This will also point (alias) the domain to the ALB, so AWS can tell it is hosting it.
+
+```
+ansible-playbook -e "domain=rinse.one" -e "initial=true" aws_web_domain_and_cert.yml
+```
+
+After this is completed, update the domain's DNS servers to those listed in Route53 hosted zone.
+Once this has taken effect, then we can proceed with the next step to create the SSL certificate.
+
+Re-run the same playbook without the `initial` flag to create the auto-renewing certificate.
 
 ```
 ansible-playbook -e "domain=rinse.one" aws_web_domain_and_cert.yml
