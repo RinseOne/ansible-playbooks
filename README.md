@@ -5,6 +5,7 @@
     - [Prerequisites](#prerequisites)
     - [VPC](#vpc)
     - [Base AMI](#base-ami)
+    - [Provision Bastion Host](#provision-bastion-host)
     - [Web Base AMI](#web-base-ami)
     - [Web App AMI](#web-app-ami)
     - [Load Balancer and Autoscaling Group](#load-balancer-and-autoscaling-group)
@@ -41,6 +42,14 @@ the instance. It also cleans up old AMIs, keeping only the latest one.
 
 ```
 ansible-playbook -e "aws_region=us-east-1" create_base_ami.yml
+```
+
+### Provision Bastion Host
+
+Uses the base AMI to create a bastion host.
+
+```
+ansible-playbook -e "aws_region=us-east-1" provision_bastion.yml
 ```
 
 ### Web Base AMI
