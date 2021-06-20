@@ -1,0 +1,7 @@
+---
+
+- name: Create web app AMI
+  import_playbook: create_web_app_ami.yml
+
+- name: Deploy latest web app AMI
+  import_playbook: deploy_web_app_ami.yml

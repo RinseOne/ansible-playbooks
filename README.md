@@ -9,9 +9,8 @@
     - [Web Base AMI](#web-base-ami)
     - [Web App AMI](#web-app-ami)
     - [Load Balancer and Autoscaling Group](#load-balancer-and-autoscaling-group)
-  - [Releases](#releases)
-    - [Create a New Web App AMI](#create-a-new-web-app-ami)
-    - [Release Latest Web App AMI](#release-latest-web-app-ami)
+  - [Deployments](#deployments)
+    - [Create and Deploy a New Web App AMI](#create-and-deploy-a-new-web-app-ami)
 
 ## Base setup
 
@@ -63,7 +62,25 @@ ansible-playbook -e "aws_region=us-east-1" create_web_base_ami.yml
 
 ### Web App AMI
 
-Follow instructions for [creating a new web app AMI](#create-a-new-web-app-ami) below.
+Starts an instance from the web base AMI, installs specified `rinseweb` release as a daemon,
+creates the AMI and terminates the instance. It also cleans up old web app AMIs, keeping only the
+latest two.
+
+```
+ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=VERSION" create_web_app_ami.yml
+```
+
+Just substitute the `VERSION` with the actual version; for example
+
+```
+ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=0.0.1" create_web_app_ami.yml
+```
+
+This command will expect the OTP release archive to be available at the following location
+
+```
+https://github.com/RinseOne/rinseweb/releases/download/0.0.1/rinseweb.tar.gz
+```
 
 ### Load Balancer and Autoscaling Group
 
@@ -95,38 +112,22 @@ Finally, create the HTTPS listener for the ALB that uses the SSL certificate jus
 ansible-playbook -e "aws_region=us-east-1" deploy_web_app_ami.yml
 ```
 
-## Releases
+## Deployments
 
 This section covers steps needed every time we want to deploy a new version of the web app.
 
-### Create a New Web App AMI
+### Create and Deploy a New Web App AMI
 
-Starts an instance from the web base AMI, installs specified `rinseweb` release as a daemon,
-creates the AMI and terminates the instance. It also cleans up old web app AMIs, keeping only the
-latest two.
+The single playbook accomplishes the task. It performs the following steps:
 
-```
-ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=VERSION" create_web_app_ami.yml
-```
-
-Just substitute the `VERSION` with the actual version; for example
+* Starts an EC2 instance using the latest web base AMI
+* Downloads, extracts and installs the specified release archive to it as a systemd service
+* Creates a new AMI
+* Cleans up old AMIs, keeping the last 2, and shuts down the instance
+* Uses the newly made AMI to deploy to the autoscaling group
 
 ```
-ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=0.0.1" create_web_app_ami.yml
+ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=VERSION" create_and_deploy_web_app_ami.yml
 ```
 
-This command will expect the OTP release archive to be available at the following location
-
-```
-https://github.com/RinseOne/rinseweb/releases/download/0.0.1/rinseweb.tar.gz
-```
-
-### Release Latest Web App AMI
-
-To deploy the latest web app AMI, run the same playbook used to provision the ALB and ASG.
-This will look up the latest web app AMI and set it to the ASG which, in turn, will replace
-existing EC2 instances with the ones based on the new AMI.
-
-```
-ansible-playbook -e "aws_region=us-east-1" deploy_web_app_ami.yml
-```
+Similarly to above, substitute `VERSION` with the actual version.
