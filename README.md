@@ -131,3 +131,13 @@ ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=VERSION" 
 ```
 
 Similarly to above, substitute `VERSION` with the actual version.
+
+## SSH to Bastion and beyond
+
+External SSH sessions can only be established to the bastion host. Get the IP address of the bastion host from the AWS console, and then
+
+```
+ssh -A ubuntu@<ip address>
+```
+
+The `-A` option enables forwarding of connections from ssh-agent, so we can now SSH from bastion to any other host using its internal IP address.
