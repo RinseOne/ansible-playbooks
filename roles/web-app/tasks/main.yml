@@ -7,6 +7,9 @@
 # - web_app_ami_id
 # - web_app_initial_setup
 # - web_app_instance_type
+# - web_app_instances_desired
+# - web_app_instances_max
+# - web_app_instances_min
 # - web_app_region
 # - web_app_asg_cpu_scaling_threshold
 # - web_app_server_sg_ids
@@ -40,6 +43,9 @@
       AmiId: "{{ web_app_ami_id }}"
       InitialSetupNoHttps: "{{ web_app_initial_setup }}"
       InstanceType: "{{ web_app_instance_type }}"
+      InstancesDesired: "{{ web_app_instances_desired }}"
+      InstancesMax: "{{ web_app_instances_max }}"
+      InstancesMin: "{{ web_app_instances_min }}"
       ScalingCpuUtilizationThreshold: "{{ web_app_asg_cpu_scaling_threshold }}"
       ServerSecurityGroupIds: "{{ web_app_server_sg_ids }}"
       VpcId: "{{ web_app_vpc_id }}"

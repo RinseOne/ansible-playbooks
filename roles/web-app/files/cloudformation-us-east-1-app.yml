@@ -19,6 +19,15 @@ Parameters:
   InstanceType:
     Description: Web server EC2 instance type
     Type: String
+  InstancesDesired:
+    Description: Desired capacity for the autoscaling group
+    Type: Number
+  InstancesMin:
+    Description: Minimum size of the autoscaling group
+    Type: Number
+  InstancesMax:
+    Description: Maximum size of the autoscaling group
+    Type: Number
   ScalingCpuUtilizationThreshold:
     Description: Autoscaling group CPU utiliation % threshold at which to trigger a scaling out event
     Type: Number
@@ -40,14 +49,14 @@ Resources:
   WebAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      DesiredCapacity: 1
+      DesiredCapacity: !Ref InstancesDesired
       HealthCheckGracePeriod: 120
       HealthCheckType: ELB
       LaunchTemplate:
         LaunchTemplateId: !Ref WebLaunchTemplate
         Version: !GetAtt WebLaunchTemplate.LatestVersionNumber
-      MaxSize: 3
-      MinSize: 1
+      MaxSize: !Ref InstancesMax
+      MinSize: !Ref InstancesMin
       TargetGroupARNs:
         - !Ref WebTargetGroup
       VPCZoneIdentifier: !Ref AlbSubnetIds
