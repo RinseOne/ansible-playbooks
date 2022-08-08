@@ -3,9 +3,10 @@
 # Launches EC2 instance with specified AMI, or makes sure it exists
 # Inputs:
 # - ami_id
-# - instance_tags: A hash dictionary of instance tags
+# - instance_tags: A dictionary of tags to attach to the EC2 instance(s)
 # - instance_type
-# - count
+# - count: Number of EC2 instance(s)
+# - count_filters: A dictionary of filters to use for counting
 # - vpc_subnet_id
 # - security_group_id
 # - region
@@ -13,18 +14,19 @@
 # - ec2
 
 - name: Launch instance
-  amazon.aws.ec2:
+  amazon.aws.ec2_instance:
     key_name: default
-    instance_tags: "{{ instance_tags }}"
     instance_type: "{{ instance_type }}"
-    image: "{{ ami_id }}"
+    image_id: "{{ ami_id }}"
     wait: yes
     exact_count: "{{ count }}"
-    count_tag: "{{ instance_tags }}"
-    assign_public_ip: yes
+    filters: "{{ count_filters }}"
     vpc_subnet_id: "{{ vpc_subnet_id }}"
-    group_id: "{{ security_group_id }}"
+    security_group: "{{ security_group_id }}"
     region: "{{ region }}"
+    network:
+      assign_public_ip: yes
+    tags: "{{ instance_tags }}"
   register: ec2
 
 - name: Wait for SSH to come up
