@@ -14,7 +14,7 @@
   register: ec2_instances
 
 - name: Terminate instance
-  amazon.aws.ec2:
+  amazon.aws.ec2_instance:
     state: 'absent'
     instance_ids: "{{ item.instance_id }}"
     region: "{{ aws_ec2_terminate_region }}"
