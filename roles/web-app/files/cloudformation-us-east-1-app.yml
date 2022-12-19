@@ -16,6 +16,15 @@ Parameters:
     AllowedValues:
       - true
       - false
+  InstanceIAMPolicyName:
+    Description: Name of the IAM policy attached to the IAM role
+    Type: String
+  InstanceIAMProfileName:
+    Description: Name of the IAM instance profile for the EC2 instances
+    Type: String
+  InstanceIAMRoleName:
+    Description: Name of the IAM role attached to the EC2 instance profile
+    Type: String
   InstanceType:
     Description: Web server EC2 instance type
     Type: String
@@ -28,6 +37,9 @@ Parameters:
   InstancesMax:
     Description: Maximum size of the autoscaling group
     Type: Number
+  ParameterStorePath:
+    Description: Path to which EC2 instances will have access to in SSM Parameter Store
+    Type: String
   ScalingCpuUtilizationThreshold:
     Description: Autoscaling group CPU utiliation % threshold at which to trigger a scaling out event
     Type: Number
@@ -45,6 +57,32 @@ Conditions:
     - 'false'
 
 Resources:
+
+  WebIAMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref InstanceIAMPolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ssm:GetParameter"
+            Resource: !Join ["", ["arn:aws:ssm:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", !Ref ParameterStorePath]]
+
+  WebIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref InstanceIAMRoleName
+      ManagedPolicyArns:
+        - !Ref WebIAMPolicy
+
+  WebIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Ref InstanceIAMProfileName
+      Roles:
+        - !Ref WebIAMRole
 
   WebAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -87,6 +125,7 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
+        IamInstanceProfile: !Ref WebIAMInstanceProfile
         ImageId: !Ref AmiId
         InstanceType: !Ref InstanceType
         SecurityGroupIds: !Ref ServerSecurityGroupIds
