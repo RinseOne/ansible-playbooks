@@ -49,9 +49,9 @@ hostnames:
 # a list in order of precedence for hostname variables.
 # 
   - ip-address
-  - dns-name
-  - tag:Name
-  - private-ip-address
+#  - dns-name
+#  - tag:Name
+#  - private-ip-address
 
 compose:
 # use if you need to connect via the ec2
@@ -62,3 +62,4 @@ compose:
 # instances don't use a public ip address
 #
 #  ansible_host: private_ip_address
+#  ansible_host: public_ip_address
