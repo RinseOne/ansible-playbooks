@@ -22,6 +22,12 @@ Resources:
             EvaluateTargetHealth: true
             HostedZoneId: !ImportValue WebLoadBalancerHostedZoneIdUsEast1
           Type: A
+        - Name: !Ref Domain
+          AliasTarget:
+            DNSName: !ImportValue WebLoadBalancerDnsNameUsEast1
+            EvaluateTargetHealth: true
+            HostedZoneId: !ImportValue WebLoadBalancerHostedZoneIdUsEast1
+          Type: AAAA
 
   WebMailRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
