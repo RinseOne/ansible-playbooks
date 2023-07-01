@@ -29,6 +29,9 @@
     tags: "{{ instance_tags }}"
   register: ec2
 
+- name: Refresh inventory
+  meta: refresh_inventory
+
 - name: Wait for SSH to come up
   delegate_to: "{{ item.public_ip_address }}"
   wait_for_connection:
