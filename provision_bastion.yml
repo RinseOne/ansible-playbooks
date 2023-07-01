@@ -22,11 +22,6 @@
         region: "{{ aws_region }}"
       }
 
-- hosts: localhost
-  tasks:
-    - name: Refresh inventory
-      meta: refresh_inventory
-
 - hosts: tag_Name_bastion
   roles:
     - bastion
