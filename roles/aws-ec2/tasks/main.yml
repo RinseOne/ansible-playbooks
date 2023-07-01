@@ -30,8 +30,9 @@
   register: ec2
 
 - name: Wait for SSH to come up
-  delegate_to: "{{ item.public_dns_name }}"
+  delegate_to: "{{ item.public_ip_address }}"
   wait_for_connection:
-    delay: 60
+    delay: 30
+    sleep: 5
     timeout: 320
   loop: "{{ ec2.instances }}"
