@@ -28,8 +28,17 @@
   roles:
     - {
         role: web-app-release,
-        app_version: "{{ web_app_release_version }}"
+        app_version: "{{ web_app_release_version }}",
+        os_arch: "ubuntu-22.04-amd64"
       }
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Pause to verify web app candidate instance
+      pause:
+        prompt: "Web App candidate instance is ready. Press enter when ready to proceed."
+      when: pause_after_instance_ready | default('false') == 'true'
 
 - hosts: localhost
   roles:

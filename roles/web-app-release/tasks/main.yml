@@ -3,11 +3,12 @@
 # Installs given version of the OTP application as a systemd service
 # Inputs:
 # - app_version
+# - os_arch
 # Outputs: None
 
 - name: Download release archive
   get_url:
-    url: "https://github.com/RinseOne/rinseweb/releases/download/{{ app_version }}/rinseweb.tar.gz"
+    url: "https://github.com/RinseOne/rinseweb/releases/download/{{ app_version }}/rinseweb-{{ os_arch }}.tar.gz"
     dest: /tmp/rinseweb.tar.gz
 
 - name: Unarchive the release

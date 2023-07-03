@@ -11,6 +11,7 @@
     - [Load Balancer and Autoscaling Group](#load-balancer-and-autoscaling-group)
   - [Deployments](#deployments)
     - [Create and Deploy a New Web App AMI](#create-and-deploy-a-new-web-app-ami)
+  - [SSH to Bastion and beyond](#ssh-to-bastion-and-beyond)
 
 ## Base setup
 
@@ -79,8 +80,11 @@ ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=0.0.1" cr
 This command will expect the OTP release archive to be available at the following location
 
 ```
-https://github.com/RinseOne/rinseweb/releases/download/0.0.1/rinseweb.tar.gz
+https://github.com/RinseOne/rinseweb/releases/download/0.0.1/rinseweb-ubuntu-22.04-amd64.tar.gz
 ```
+
+Optionally, when `-e "pause_after_instance_ready=true"` flag is specified, the playbook will pause after the web app
+candidate instance is ready, before taking its AMI and shutting it down.
 
 ### Load Balancer and Autoscaling Group
 
@@ -132,7 +136,12 @@ ansible-playbook -e "aws_region=us-east-1" -e "web_app_release_version=VERSION" 
 
 Similarly to above, substitute `VERSION` with the actual version.
 
+Optionally, when `-e "pause_after_instance_ready=true"` flag is specified, the playbook will pause after the web app
+candidate instance is ready, before taking its AMI and shutting it down.
+
 ## SSH to Bastion and beyond
+
+Prerequiesite: `ssh-agent` must be running on local machine and it must have the keys added to it via `ssh-add`.
 
 External SSH sessions can only be established to the bastion host. Get the IP address of the bastion host from the AWS console, and then
 

@@ -10,7 +10,7 @@
     - {
         role: aws-ami-lookup,
         owner_account_id: 679593333241, # Canonical
-        filter_by_name: "ubuntu-minimal/images/hvm-ssd/ubuntu-focal-20.04-amd64-minimal-*"
+        filter_by_name: "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04-amd64-minimal-*"
       }
     - {
         role: aws-ec2,
