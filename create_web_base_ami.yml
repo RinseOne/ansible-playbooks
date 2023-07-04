@@ -18,17 +18,11 @@
         instance_tags: {"Name": "amibuilder_web_base"},
         instance_type: "t3.nano",
         count: 1,
-        count_filters: {"tag:Name": "amibuilder_web_base"},
+        count_filters: {"tag:Name": "amibuilder_web_base", "instance-state-name": "running"},
         vpc_subnet_id: "{{ aws_vpc_output.stack_outputs.PublicSubnetBId }}",
         security_group_id: "{{ aws_vpc_sg_output.stack_outputs.BastionSgId }}",
         region: "{{ aws_region }}"
       }
-
-- hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Refresh inventory
-      meta: refresh_inventory
 
 - hosts: tag_Name_amibuilder_web_base
   roles:

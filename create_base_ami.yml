@@ -10,7 +10,7 @@
     - {
         role: aws-ami-lookup,
         owner_account_id: 679593333241, # Canonical
-        filter_by_name: "ubuntu-minimal/images/hvm-ssd/ubuntu-focal-20.04-amd64-minimal-*"
+        filter_by_name: "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04-amd64-minimal-*"
       }
     - {
         role: aws-ec2,
@@ -18,17 +18,11 @@
         instance_tags: {"Name": "amibuilder_base"},
         instance_type: "t3.nano",
         count: 1,
-        count_filters: {"tag:Name": "amibuilder_base"},
+        count_filters: {"tag:Name": "amibuilder_base", "instance-state-name": "running"},
         vpc_subnet_id: "{{ aws_vpc_output.stack_outputs.PublicSubnetCId }}",
         security_group_id: "{{ aws_vpc_sg_output.stack_outputs.BastionSgId }}",
         region: "{{ aws_region }}"
       }
-
-- hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Refresh inventory
-      meta: refresh_inventory
 
 - hosts: tag_Name_amibuilder_base
   roles:

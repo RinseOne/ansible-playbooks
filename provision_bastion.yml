@@ -17,15 +17,11 @@
         instance_tags: {"Name": "bastion"},
         instance_type: "t3.nano",
         count: 1,
+        count_filters: {"tag:Name": "bastion", "instance-state-name": "running"},
         vpc_subnet_id: "{{ aws_vpc_output.stack_outputs.PublicSubnetDId }}",
         security_group_id: "{{ aws_vpc_sg_output.stack_outputs.BastionSgId }}",
         region: "{{ aws_region }}"
       }
-
-- hosts: localhost
-  tasks:
-    - name: Refresh inventory
-      meta: refresh_inventory
 
 - hosts: tag_Name_bastion
   roles:

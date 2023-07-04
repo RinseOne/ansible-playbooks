@@ -147,7 +147,7 @@ Resources:
   WebApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      IpAddressType: ipv4
+      IpAddressType: dualstack
       Scheme: internet-facing
       SecurityGroups: !Ref AlbSecurityGroupIds
       Subnets: !Ref AlbSubnetIds

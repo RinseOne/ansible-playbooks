@@ -18,24 +18,27 @@
         instance_tags: {"Name": "amibuilder_web_app"},
         instance_type: "t3.nano",
         count: 1,
-        count_filters: {"tag:Name": "amibuilder_web_app"},
+        count_filters: {"tag:Name": "amibuilder_web_app", "instance-state-name": "running"},
         vpc_subnet_id: "{{ aws_vpc_output.stack_outputs.PublicSubnetBId }}",
         security_group_id: "{{ aws_vpc_sg_output.stack_outputs.BastionSgId }}",
         region: "{{ aws_region }}"
       }
 
-- hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Refresh inventory
-      meta: refresh_inventory
-
 - hosts: tag_Name_amibuilder_web_app
   roles:
     - {
         role: web-app-release,
-        app_version: "{{ web_app_release_version }}"
+        app_version: "{{ web_app_release_version }}",
+        os_arch: "ubuntu-22.04-amd64"
       }
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Pause to verify web app candidate instance
+      pause:
+        prompt: "Web App candidate instance is ready. Press enter when ready to proceed."
+      when: pause_after_instance_ready | default('false') == 'true'
 
 - hosts: localhost
   roles:
