@@ -5,13 +5,14 @@
 # - web_app_alb_sg_ids
 # - web_app_alb_subnet_ids
 # - web_app_ami_id
+# - web_app_asg_cpu_scaling_threshold
 # - web_app_initial_setup
 # - web_app_instance_type
 # - web_app_instances_desired
 # - web_app_instances_max
 # - web_app_instances_min
+# - web_app_preview: (boolean) when true and used with an existing stack, will generate changeset only
 # - web_app_region
-# - web_app_asg_cpu_scaling_threshold
 # - web_app_server_sg_ids
 # - web_app_vpc_id
 # Outputs:
@@ -33,9 +34,10 @@
 
 - name: Web app via CloudFormation
   amazon.aws.cloudformation:
+    create_changeset: "{{ web_app_preview }}"
+    region: "{{ web_app_region }}"
     stack_name: "web-app-use1"
     state: "present"
-    region: "{{ web_app_region }}"
     template: "roles/web-app/files/cloudformation-{{ web_app_region }}-app.yml"
     template_parameters:
       AlbSecurityGroupIds: "{{ web_app_alb_sg_ids }}"
@@ -58,3 +60,8 @@
 - name: Web app output
   debug:
     msg: "{{ aws_web_app_output.stack_outputs }}"
+
+- name: Web app changeset
+  debug:
+    msg: "{{ aws_web_app_output.change_set_id }}"
+  when: aws_web_app_output.change_set_id is defined
