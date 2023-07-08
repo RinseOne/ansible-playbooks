@@ -69,13 +69,22 @@ Resources:
             Action:
               - "ssm:GetParameter"
             Resource: !Join ["", ["arn:aws:ssm:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", !Ref ParameterStorePath]]
+      Roles:
+        - !Ref WebIAMRole
 
   WebIAMRole:
     Type: AWS::IAM::Role
     Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
       RoleName: !Ref InstanceIAMRoleName
-      ManagedPolicyArns:
-        - !Ref WebIAMPolicy
 
   WebIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -125,7 +134,8 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        IamInstanceProfile: !Ref WebIAMInstanceProfile
+        IamInstanceProfile:
+          Arn: !GetAtt WebIAMInstanceProfile.Arn
         ImageId: !Ref AmiId
         InstanceType: !Ref InstanceType
         SecurityGroupIds: !Ref ServerSecurityGroupIds
