@@ -25,5 +25,6 @@
         web_app_initial_setup: "{{ initial | default('false') }}",
         web_app_region: "{{ aws_region }}",
         web_app_server_sg_ids: "{{ [aws_vpc_sg_output.stack_outputs.WebAppServerSgId] | join(',') }}",
+        web_app_preview: "{{ preview | default(false) }}",
         web_app_vpc_id: "{{ aws_vpc_output.stack_outputs.VpcId }}"
       }
