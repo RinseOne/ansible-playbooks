@@ -16,8 +16,8 @@ Parameters:
     AllowedValues:
       - true
       - false
-  InstanceIAMPolicyName:
-    Description: Name of the IAM policy attached to the IAM role
+  InstanceIAMManagedPolicyName:
+    Description: Name of the IAM managed policy attached to the IAM role
     Type: String
   InstanceIAMProfileName:
     Description: Name of the IAM instance profile for the EC2 instances
@@ -58,10 +58,10 @@ Conditions:
 
 Resources:
 
-  WebIAMPolicy:
-    Type: AWS::IAM::Policy
+  WebIAMManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: !Ref InstanceIAMPolicyName
+      ManagedPolicyName: !Ref InstanceIAMManagedPolicyName
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -69,8 +69,6 @@ Resources:
             Action:
               - "ssm:GetParameter"
             Resource: !Join ["", ["arn:aws:ssm:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", !Ref ParameterStorePath]]
-      Roles:
-        - !Ref WebIAMRole
 
   WebIAMRole:
     Type: AWS::IAM::Role
@@ -84,6 +82,8 @@ Resources:
                 - "ec2.amazonaws.com"
             Action:
               - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref WebIAMManagedPolicy
       RoleName: !Ref InstanceIAMRoleName
 
   WebIAMInstanceProfile:

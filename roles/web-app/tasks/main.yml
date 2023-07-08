@@ -44,7 +44,7 @@
       AlbSubnetIds: "{{ web_app_alb_subnet_ids }}"
       AmiId: "{{ web_app_ami_id }}"
       InitialSetupNoHttps: "{{ web_app_initial_setup }}"
-      InstanceIAMPolicyName: "web-app"
+      InstanceIAMManagedPolicyName: "web-app"
       InstanceIAMProfileName: "web-app"
       InstanceIAMRoleName: "web-app"
       InstanceType: "{{ web_app_instance_type }}"
