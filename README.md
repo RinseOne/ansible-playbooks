@@ -1,5 +1,8 @@
 # Ansible Playbooks
 
+> **_NOTE:_** rinse.one no longer runs on AWS. However, this infrastructure setup
+> is still available as an archive as a reference for anyone.
+
 - [Ansible Playbooks](#ansible-playbooks)
   - [Base setup](#base-setup)
     - [Prerequisites](#prerequisites)
